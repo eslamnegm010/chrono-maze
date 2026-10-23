@@ -8,7 +8,7 @@ Built with [three.js](https://threejs.org/) and [Vite](https://vitejs.dev/). The
 ## Quick start
 
 ```bash
-nvm use            # Node 20 (see .nvmrc); any Node ≥ 18 works
+nvm use            # Node 20 (see .nvmrc); Node ≥ 20.19 required
 npm install
 npm run dev        # http://localhost:5173
 ```
