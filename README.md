@@ -66,6 +66,8 @@ tests/                 unit tests for pure logic (grid, levels, math, settings, 
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together and how to extend them (new levels, enemies, weapons).
 
+The multiplayer roadmap (shared time fields, player identity, smarter bots, new modes) is in [docs/ROADMAP-MULTIPLAYER.md](docs/ROADMAP-MULTIPLAYER.md).
+
 ## Tech notes
 
 - **three.js 0.160** is pinned exactly. Lights use physical units; the conversions from the game's original tuning live in `src/render/lights.js`.
