@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Chrono-Maze 3D — a neon FPS where time only moves when you move." />
+    <meta name="theme-color" content="#05060d" />
+    <title>Chrono-Maze 3D</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="canvas-container"></div>
+    <div id="lowhp-overlay"></div>
+    <div id="damage-overlay"></div>
+
+    <div id="crosshair">
+      <i class="ch t"></i><i class="ch b"></i><i class="ch l"></i><i class="ch r"></i><i class="dot"></i>
+      <div id="hitmarker"><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div id="dmg-indicators"></div>
+
+    <div id="hud" class="hidden">
+      <div class="panel" id="hud-radar">
+        <canvas id="radar-canvas" width="150" height="150"></canvas>
+        <div class="radar-label">SONAR</div>
+        <div id="wave-label" class="num">WAVE 1</div>
+      </div>
+
+      <div class="panel" id="hud-score">
+        <div class="row"><span>النقاط</span><span class="num" id="score-val">0</span></div>
+        <div class="row"><span>الأعداء المتبقيين</span><span class="num" id="enemies-val">0</span></div>
+        <div id="combo" class="num">COMBO x1</div>
+        <div class="combo-bar"><div id="combo-fill"></div></div>
+      </div>
+
+      <div class="panel" id="hud-vitals">
+        <div class="bar-label"><span>الدرع</span><span class="num" id="hp-val">100</span></div>
+        <div class="bar"><div id="hp-fill"></div></div>
+        <div class="bar-label"><span>داش ⚡</span><span id="dash-state">جاهز</span></div>
+        <div class="bar" id="dash-bar"><div id="dash-fill"></div></div>
+      </div>
+
+      <div class="panel" id="hud-time">
+        <div id="time-label"><span id="time-state">الزمن متجمد ⏸</span><span class="num" id="time-val">5%</span></div>
+        <div class="bar"><div id="time-fill"></div></div>
+      </div>
+
+      <div class="panel" id="hud-controls">
+        <div class="chip"><span class="key">W A S D</span><span>حركة (الزمن بيمشي معاك)</span></div>
+        <div class="chip"><span class="key">Mouse</span><span>التصويب</span></div>
+        <div class="chip"><span class="key">Click</span><span>ليزر فوري (اضغط باستمرار)</span></div>
+        <div class="chip"><span class="key">Shift</span><span>داش (مفيش ضرر وقتها)</span></div>
+        <div class="chip"><span class="key">Space</span><span>قفزة</span></div>
+        <div class="chip"><span class="key">F / R-Click</span><span>ارمي السلاح</span></div>
+        <div class="chip"><span class="key">Esc / P</span><span>إيقاف مؤقت</span></div>
+        <div class="chip"><span class="key">H</span><span>إخفاء/إظهار التعليمات</span></div>
+      </div>
+    </div>
+
+    <div id="announcer"></div>
+    <div id="killfeed"></div>
+    <div id="toast"></div>
+
+    <div id="overlay" data-mode="menu">
+      <div class="card">
+        <div class="logo">CHRONO-MAZE 3D</div>
+        <div class="subtitle only-menu">🌀 الزمن بيتحرك بس لما إنت تتحرك</div>
+        <div class="subtitle only-pause">⏸ اللعبة متوقفة</div>
+        <div class="subtitle only-over" id="over-title">💀 تم تدميرك</div>
+
+        <div class="info only-menu">
+          <div>⏳ <b>الزمن مربوط بحركتك:</b> اقف مكانك تلاقي الأعداء والرصاص متجمدين، اتحرك والعالم كله يتحرك معاك.</div>
+          <div>🎯 <b>الليزر فوري:</b> بيضرب مكان الصليب بالظبط. ضربة في الراس = قتل فوري لأي عدو.</div>
+          <div>🛡️ <b>اضرب الرصاص:</b> تقدر تفجّر رصاص الأعداء في الهوا قبل ما يوصلك.</div>
+          <div>💥 <b>البراميل الصفرا:</b> انفجار بسلسلة يمسح كل اللي حواليه — ابعد عنها.</div>
+          <div>🟣 <b>الأعداء التقال:</b> محتاجين 3 طلقات في الجسم، وبيضربوا 3 رصاصات مع بعض. الموجات بتصعب كل مرة.</div>
+        </div>
+
+        <div class="stats only-over">
+          <div class="stat"><span class="num" id="st-score">0</span><span>النقاط</span></div>
+          <div class="stat"><span class="num" id="st-wave">0</span><span>الموجة</span></div>
+          <div class="stat"><span class="num" id="st-kills">0</span><span>القتلى</span></div>
+          <div class="stat"><span class="num" id="st-heads">0</span><span>هيدشوت</span></div>
+        </div>
+
+        <div class="settings">
+          <label for="sens">حساسية الماوس</label>
+          <input type="range" id="sens" min="0.3" max="3" step="0.05" value="1" />
+          <span class="val" id="sens-val">1.00</span>
+          <label for="vol">الصوت</label>
+          <input type="range" id="vol" min="0" max="1" step="0.05" value="0.7" />
+          <span class="val" id="vol-val">70%</span>
+          <label for="bloom">جرافيك عالي (Bloom + تأثيرات)</label>
+          <span></span>
+          <input type="checkbox" id="bloom" checked />
+        </div>
+
+        <div class="btns">
+          <button class="btn" id="btn-main">
+            <span class="only-menu">ادخل المعركة ⚡</span>
+            <span class="only-pause">كمّل ▶</span>
+            <span class="only-over">العب تاني 🔁</span>
+          </button>
+          <button class="btn ghost only-pause" id="btn-restart">ابدأ من الأول</button>
+        </div>
+        <div class="best">أعلى نتيجة: <span class="num" id="best-val">0</span></div>
+        <div id="load-error"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
