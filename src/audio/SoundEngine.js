@@ -63,7 +63,8 @@ export class SoundEngine {
   }
 
   setTimeScale(ts) {
-    if (!this.ctx) return;
+    if (!this.ctx || !Number.isFinite(ts)) return;
+    ts = Math.min(Math.max(ts, 0), 1);
     const t = this.ctx.currentTime;
     this.world.frequency.setTargetAtTime(500 + Math.pow(ts, 1.5) * 17500, t, 0.06);
     this.droneOsc[0].frequency.setTargetAtTime(36 + ts * 24, t, 0.1);

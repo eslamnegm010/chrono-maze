@@ -24,6 +24,11 @@ export class Hud {
       timeFill: $('time-fill'),
       wave: $('wave-label'),
       controls: $('hud-controls'),
+      team: $('hud-team'),
+      teamList: $('team-list'),
+      room: $('room-label'),
+      downed: $('downed'),
+      reviveFill: $('revive-fill'),
       cross: {
         t: doc.querySelector('#crosshair .ch.t'),
         b: doc.querySelector('#crosshair .ch.b'),
@@ -44,6 +49,31 @@ export class Hud {
     this.el.root.classList.toggle('hidden', !v);
   }
 
+  /** Room code shown on the team panel; null hides the panel (solo). */
+  setRoom(code) {
+    this.el.team.classList.toggle('hidden', !code);
+    if (code) this.el.room.textContent = code;
+  }
+
+  _renderTeam(rows) {
+    const doc = this.el.teamList.ownerDocument;
+    this.el.teamList.replaceChildren(
+      ...rows.map((r) => {
+        const row = doc.createElement('div');
+        row.className = `mate${r.down ? ' down' : ''}`;
+        row.style.setProperty('--c', r.color.css);
+        const name = doc.createElement('span');
+        name.className = 'mate-name';
+        name.textContent = `${r.color.sigil} ${r.name}`;
+        const hp = doc.createElement('span');
+        hp.className = 'mate-hp num';
+        hp.textContent = r.down ? '⬇' : Math.ceil(r.hp);
+        row.append(name, hp);
+        return row;
+      }),
+    );
+  }
+
   toggleHelp() {
     this.el.controls.classList.toggle('faded');
   }
@@ -55,7 +85,8 @@ export class Hud {
   }
 
   /**
-   * @param v {score, enemies, wave, hp, maxHp, dashPct, timeScale, frozen, combo, comboFrac, crosshairGap}
+   * @param v {score, enemies, wave, hp, maxHp, dashPct, timeScale, frozen, combo, comboFrac, crosshairGap,
+   *           down, reviveFrac, players: [{name, color, hp, down}] | null}
    */
   update(dt, v) {
     const e = this.el;
@@ -87,6 +118,12 @@ export class Hud {
       if (x > 1) e.combo.textContent = `COMBO x${x}`;
     });
     e.comboFill.style.width = `${v.comboFrac * 100}%`;
+    this._set('down', !!v.down, (d) => e.downed.classList.toggle('hidden', !d));
+    if (v.down) this._set('revive', Math.round((v.reviveFrac || 0) * 100), (x) => (e.reviveFill.style.transform = `scaleX(${x / 100})`));
+    if (v.players) {
+      const key = v.players.map((r) => `${r.name}|${r.color.key}|${r.down ? 'd' : Math.ceil(r.hp)}`).join(',');
+      this._set('team', key, () => this._renderTeam(v.players));
+    }
     this._set('gap', Math.round(v.crosshairGap), (g) => {
       const c = e.cross;
       c.t.style.top = `${-g - 9}px`;

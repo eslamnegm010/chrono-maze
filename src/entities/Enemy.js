@@ -73,13 +73,14 @@ export class Enemy {
     this.game.scene.remove(this.model.root, this.model.aim);
   }
 
-  alert(playSound) {
+  alert(playSound, target = this.target ?? this.game.player) {
     if (this.state === EnemyState.HUNT) return;
     this.state = EnemyState.HUNT;
     this.model.beacon.visible = true;
     this.lostT = 0;
     this.fireCd = Math.max(this.fireCd, rand(0.6, 1.1));
-    this.lastSeen.copy(this.game.player.pos);
+    this.target = target;
+    this.lastSeen.copy(target.pos);
     if (playSound) this.game.playAt('alert', this.pos);
   }
 
@@ -111,12 +112,28 @@ export class Enemy {
     this.hasPatrol = false;
   }
 
+  /** Nearest standing player; sticks to the current one unless another is clearly closer. */
+  _pickTarget() {
+    let best = null;
+    let bestD = Infinity;
+    for (const t of this.game.targets()) {
+      let d = Math.hypot(t.pos.x - this.pos.x, t.pos.z - this.pos.z);
+      if (t === this.target) d *= 0.75;
+      if (d < bestD) {
+        bestD = d;
+        best = t;
+      }
+    }
+    return best;
+  }
+
   update(dt, wdt) {
     const g = this.game;
-    const p = g.player;
     const m = this.model;
     const s = this.scale;
-    const animDt = dt * Math.max(g.time.scale, 0.3);
+    const animDt = dt * Math.max(wdt / Math.max(dt, 1e-5), 0.3);
+    this.target = this._pickTarget();
+    const p = this.target ?? g.player;
 
     if (this.spawnT < 1) {
       this.spawnT = Math.min(1, this.spawnT + animDt / 0.7);
@@ -136,7 +153,7 @@ export class Enemy {
     const nz = toZ / dist;
     _eye.set(p.pos.x, p.eyeY, p.pos.z);
     _from.set(this.pos.x, 1.6 * s, this.pos.z);
-    this.canSee = g.state !== GameState.DYING && dist < TUNE.viewRange && g.grid.hasLineOfSight(_from, _eye);
+    this.canSee = !!this.target && g.state !== GameState.DYING && dist < TUNE.viewRange && g.grid.hasLineOfSight(_from, _eye);
 
     if (this.state === EnemyState.PATROL && this.spawned && this.canSee) {
       const facing = Math.sin(this.yaw) * nx + Math.cos(this.yaw) * nz;
@@ -201,7 +218,7 @@ export class Enemy {
         mx = nx * fwd - nz * strafe;
         mz = nz * fwd + nx * strafe;
         speed = 3.4;
-      } else if (g.grid.stepAlongField(this.pos, g.enemies.playerField, _target)) {
+      } else if (this.target && g.grid.stepAlongField(this.pos, g.enemies.fieldFor(this.target), _target)) {
         mx = _target.x - this.pos.x;
         mz = _target.z - this.pos.z;
         speed = 3.9;
@@ -240,7 +257,7 @@ export class Enemy {
   /** Telegraphed firing: cooldown → wind-up (glow + laser sight) → shot. */
   _updateFiring(wdt) {
     const g = this.game;
-    if (this.isHunting && this.canSee && this.spawned && g.state === GameState.PLAYING) {
+    if (this.isHunting && this.canSee && this.spawned && g.simRunning) {
       if (this.windup > 0) {
         this.windup -= wdt;
         this._updateAimLine();
@@ -260,7 +277,8 @@ export class Enemy {
   }
 
   _updateAimLine() {
-    const p = this.game.player;
+    const p = this.target;
+    if (!p) return;
     const aim = this.model.aim;
     this.model.tip.getWorldPosition(_tip);
     _to.set(p.pos.x, p.eyeY - 0.3, p.pos.z).sub(_tip);
@@ -281,7 +299,8 @@ export class Enemy {
 
   _fire() {
     const g = this.game;
-    const p = g.player;
+    const p = this.target;
+    if (!p) return;
     const T = this.type;
     this.fireCd = rand(1.6, 2.6) * this.fireMul;
     const origin = this.model.tip.getWorldPosition(new THREE.Vector3());
@@ -300,5 +319,42 @@ export class Enemy {
     }
     g.playAt('enemyShoot', this.pos);
     g.effects.burst(origin.x, origin.y, origin.z, 8, 3, 0xff3366, { life: 0.25, grav: 0 });
+  }
+
+  /* ───────────── client replica (state comes from the host) ───────────── */
+
+  /** e = [id, typeIndex, x, z, yaw, flags(1=hunt, 2=windup), windupFrac, targetId] */
+  applyNet(e) {
+    this.netX = e[2];
+    this.netZ = e[3];
+    this.netYaw = e[4];
+    const hunting = (e[5] & 1) !== 0;
+    const winding = (e[5] & 2) !== 0;
+    if (hunting && !this.isHunting) this.game.playAt('alert', this.pos);
+    if (winding && this.windup <= 0) this.game.playAt('windup', this.pos);
+    this.state = hunting ? EnemyState.HUNT : EnemyState.PATROL;
+    this.windup = winding ? Math.max(0.001, (1 - e[6]) * this.type.windup) : 0;
+    this.target = winding ? this.game.targetById(e[7]) : null;
+  }
+
+  updateReplica(dt, wdt) {
+    const m = this.model;
+    const animDt = dt * Math.max(wdt / Math.max(dt, 1e-5), 0.3);
+    if (this.spawnT < 1) {
+      this.spawnT = Math.min(1, this.spawnT + animDt / 0.7);
+      m.root.scale.setScalar(this.scale * (0.01 + 0.99 * (1 - Math.pow(1 - this.spawnT, 3))));
+    }
+    const ox = this.pos.x;
+    const oz = this.pos.z;
+    const k = damp(12, dt);
+    this.pos.x += (this.netX - this.pos.x) * k;
+    this.pos.z += (this.netZ - this.pos.z) * k;
+    this.yaw = lerpAngle(this.yaw, this.netYaw, k);
+    m.root.rotation.y = this.yaw;
+    m.beacon.visible = this.isHunting;
+    // Displayed motion is interpolated in real time, so animate on real time too.
+    this._animate(dt, animDt, ox, oz);
+    if (this.windup > 0 && this.target) this._updateAimLine();
+    else m.aim.visible = false;
   }
 }

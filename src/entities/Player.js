@@ -18,10 +18,13 @@ export class Player {
     this.pos = new THREE.Vector3();
     this.vel = new THREE.Vector3();
     this.dashDir = new THREE.Vector3();
+    this.id = 'local';
+    this.name = '';
     this.reset();
   }
 
   reset() {
+    this.down = false; // multiplayer: knocked down, waiting for a revive
     this.pos.set(this.grid.cellX(this.spawn.c), 0, this.grid.cellZ(this.spawn.r));
     this.vel.set(0, 0, 0);
     this.yaw = this.spawn.yaw ?? 0;

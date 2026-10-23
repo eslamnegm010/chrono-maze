@@ -24,8 +24,9 @@ export class WaveDirector {
     this.active = true;
     g.barrels.restore();
     g.enemies.spawnWave(n);
-    g.notifier.announce(`WAVE ${n}`, 'yellow', 1300);
+    g.ui.announce(`WAVE ${n}`, 'yellow', 1300);
     g.audio.wave();
+    g.net?.broadcastEvent({ t: 'wave', n });
   }
 
   update(dt) {
@@ -33,7 +34,8 @@ export class WaveDirector {
     if (this.active && g.enemies.aliveCount === 0) {
       this.active = false;
       g.scoring.add(TUNE.waveClearBonus * this.wave, `WAVE ${this.wave} CLEAR`, 'yellow');
-      g.notifier.announce('WAVE CLEARED ✔', 'cyan', 1300);
+      g.ui.announce('WAVE CLEARED ✔', 'cyan', 1300);
+      g.onWaveCleared();
       this.timer = 3;
     }
     if (!this.active && this.timer >= 0) {

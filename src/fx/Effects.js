@@ -85,7 +85,7 @@ export class Effects {
     this.burst(pos.x, 1.3 * scale, pos.z, 40, 7, palette.fx, { life: 0.8, dir });
   }
 
-  tracer(a, b) {
+  tracer(a, b, color = 0x7ffcff) {
     const t = this.tracers[this.tracerNext];
     this.tracerNext = (this.tracerNext + 1) % this.tracers.length;
     _dir.subVectors(b, a);
@@ -95,6 +95,7 @@ export class Effects {
     t.mesh.position.copy(a).addScaledVector(_dir, len / 2);
     t.mesh.quaternion.setFromUnitVectors(UP, _dir);
     t.mesh.scale.set(0.035, len, 0.035);
+    t.mesh.material.color.setHex(color);
     t.mesh.material.opacity = 1;
     t.mesh.visible = true;
     t.life = 0.12;

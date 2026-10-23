@@ -39,6 +39,17 @@
         <div class="combo-bar"><div id="combo-fill"></div></div>
       </div>
 
+      <div class="panel hidden" id="hud-team">
+        <div class="team-title">الفريق · <span class="num" id="room-label"></span></div>
+        <div id="team-list"></div>
+      </div>
+
+      <div id="downed" class="hidden">
+        <div class="downed-title">اتوقعت!</div>
+        <div class="downed-sub">صاحبك لازم يقف جنبك ثابت عشان يرجّعك</div>
+        <div class="bar"><div id="revive-fill"></div></div>
+      </div>
+
       <div class="panel" id="hud-vitals">
         <div class="bar-label"><span>الدرع</span><span class="num" id="hp-val">100</span></div>
         <div class="bar"><div id="hp-fill"></div></div>
@@ -70,11 +81,13 @@
     <div id="overlay" data-mode="menu">
       <div class="card">
         <div class="logo">CHRONO-MAZE 3D</div>
-        <div class="subtitle only-menu">🌀 الزمن بيتحرك بس لما إنت تتحرك</div>
-        <div class="subtitle only-pause">⏸ اللعبة متوقفة</div>
-        <div class="subtitle only-over" id="over-title">💀 تم تدميرك</div>
+        <div class="subtitle" data-show="menu">🌀 الزمن بيتحرك بس لما إنت تتحرك</div>
+        <div class="subtitle" data-show="pause">⏸ اللعبة متوقفة</div>
+        <div class="subtitle" data-show="connecting">📡 بندوّر على الأوضة <span class="num room-code"></span>…</div>
+        <div class="subtitle" data-show="ready">✅ دخلت أوضة <span class="num room-code"></span> — جاهز؟</div>
+        <div class="subtitle" data-show="over" id="over-title">💀 تم تدميرك</div>
 
-        <div class="info only-menu">
+        <div class="info" data-show="menu">
           <div>⏳ <b>الزمن مربوط بحركتك:</b> اقف مكانك تلاقي الأعداء والرصاص متجمدين، اتحرك والعالم كله يتحرك معاك.</div>
           <div>🎯 <b>الليزر فوري:</b> بيضرب مكان الصليب بالظبط. ضربة في الراس = قتل فوري لأي عدو.</div>
           <div>🛡️ <b>اضرب الرصاص:</b> تقدر تفجّر رصاص الأعداء في الهوا قبل ما يوصلك.</div>
@@ -82,14 +95,40 @@
           <div>🟣 <b>الأعداء التقال:</b> محتاجين 3 طلقات في الجسم، وبيضربوا 3 رصاصات مع بعض. الموجات بتصعب كل مرة.</div>
         </div>
 
-        <div class="stats only-over">
+        <div class="stats" data-show="over">
           <div class="stat"><span class="num" id="st-score">0</span><span>النقاط</span></div>
           <div class="stat"><span class="num" id="st-wave">0</span><span>الموجة</span></div>
           <div class="stat"><span class="num" id="st-kills">0</span><span>القتلى</span></div>
           <div class="stat"><span class="num" id="st-heads">0</span><span>هيدشوت</span></div>
         </div>
 
-        <div class="settings">
+        <div class="identity" data-show="menu ready">
+          <label for="player-name">اسمك</label>
+          <input type="text" id="player-name" maxlength="16" autocomplete="off" spellcheck="false" />
+          <button class="btn ghost small" id="btn-randname" type="button" title="اسم عشوائي">🎲</button>
+          <div class="swatches" id="swatches" role="radiogroup" aria-label="لونك"></div>
+        </div>
+
+        <div class="online" data-show="menu">
+          <div class="online-title">🌐 العب مع صحابك (أونلاين ببلاش)</div>
+          <div class="online-row">
+            <button class="btn ghost" id="btn-host" type="button">افتح أوضة جديدة</button>
+            <span class="or">أو</span>
+            <input type="text" id="room-code" maxlength="6" placeholder="كود الأوضة" autocomplete="off" spellcheck="false" />
+            <button class="btn ghost" id="btn-join" type="button">ادخل</button>
+          </div>
+          <div class="online-hint">
+            ⏳ في الأونلاين كل لاعب حواليه «فقاعة زمن»: الزمن جواها بيمشي بحركته هو. لو صاحبك وقع، اقف جنبه ثابت 3 ثواني عشان ترجّعه.
+          </div>
+        </div>
+
+        <div class="room-box" data-show="pause" data-mp="1">
+          <span>الأوضة: <b class="num room-code"></b></span>
+          <button class="btn ghost small" id="btn-invite" type="button">انسخ لينك الدعوة 🔗</button>
+        </div>
+        <div class="waiting" id="over-waiting" data-show="over">مستني صاحب الأوضة يبدأ جولة جديدة…</div>
+
+        <div class="settings" data-show="menu pause ready">
           <label for="sens">حساسية الماوس</label>
           <input type="range" id="sens" min="0.3" max="3" step="0.05" value="1" />
           <span class="val" id="sens-val">1.00</span>
@@ -102,14 +141,16 @@
         </div>
 
         <div class="btns">
-          <button class="btn" id="btn-main">
-            <span class="only-menu">ادخل المعركة ⚡</span>
-            <span class="only-pause">كمّل ▶</span>
-            <span class="only-over">العب تاني 🔁</span>
+          <button class="btn" id="btn-main" data-show="menu pause over ready">
+            <span data-show="menu">العب لوحدك ⚡</span>
+            <span data-show="pause">كمّل ▶</span>
+            <span data-show="over">العب تاني 🔁</span>
+            <span data-show="ready">ادخل المعركة ⚡</span>
           </button>
-          <button class="btn ghost only-pause" id="btn-restart">ابدأ من الأول</button>
+          <button class="btn ghost" id="btn-restart" data-show="pause">ابدأ من الأول</button>
+          <button class="btn ghost" id="btn-leave" data-show="pause over ready connecting" data-mp="1">اخرج من الأوضة</button>
         </div>
-        <div class="best">أعلى نتيجة: <span class="num" id="best-val">0</span></div>
+        <div class="best" data-show="menu pause over">أعلى نتيجة: <span class="num" id="best-val">0</span></div>
         <div id="load-error"></div>
       </div>
     </div>

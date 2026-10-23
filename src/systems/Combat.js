@@ -10,20 +10,27 @@ const _d = new THREE.Vector3();
 const _hit = new THREE.Vector3();
 const _muzzle = new THREE.Vector3();
 const _dir = new THREE.Vector3();
+const THROWABLES = 4;
 
 /**
- * Everything that deals or takes damage: the hitscan laser, the thrown
- * weapon, barrel explosions, enemy hits/kills and player damage.
+ * Everything that deals or takes damage: the hitscan laser, thrown weapons,
+ * barrel explosions, enemy hits/kills and player damage.
+ *
+ * Authority: in solo and on the multiplayer host, damage is resolved here.
+ * A client only shows its own shot locally and asks the host to resolve it.
  */
 export class Combat {
   constructor(game) {
     this.game = game;
-    this.thrown = {
-      mesh: game.viewmodel.createThrowable(game.scene),
-      active: false,
-      pos: new THREE.Vector3(),
-      vel: new THREE.Vector3(),
-    };
+    this.thrown = [];
+    for (let i = 0; i < THROWABLES; i++) {
+      this.thrown.push({
+        mesh: game.viewmodel.createThrowable(game.scene),
+        active: false,
+        pos: new THREE.Vector3(),
+        vel: new THREE.Vector3(),
+      });
+    }
     this.reset();
   }
 
@@ -31,12 +38,14 @@ export class Combat {
     this.fireCd = 0;
     this.gunReady = true;
     this.gunReturn = 0;
-    this.thrown.active = false;
-    this.thrown.mesh.visible = false;
+    for (const t of this.thrown) {
+      t.active = false;
+      t.mesh.visible = false;
+    }
   }
 
   get canFire() {
-    return this.gunReady && this.fireCd <= 0;
+    return this.gunReady && this.fireCd <= 0 && !this.game.player.down;
   }
 
   tick(dt) {
@@ -45,6 +54,12 @@ export class Combat {
       this.gunReady = true;
       this.game.viewmodel.raiseGun();
     }
+  }
+
+  /** The local player as a shooter (name/colour for feed and tracers). */
+  get localShooter() {
+    const g = this.game;
+    return { id: g.selfId, name: g.identity.name, color: g.identity.color.hex };
   }
 
   /* ───────────── player offence ───────────── */
@@ -61,21 +76,36 @@ export class Combat {
     g.camera.updateMatrixWorld();
     const o = g.camera.getWorldPosition(_o);
     const d = g.camera.getWorldDirection(_d);
-    const hit = this._traceShot(o, d);
+    const muzzle = g.viewmodel.muzzleWorld(_muzzle);
 
+    if (g.isClient) {
+      // Show the beam now (against the replicas), let the host decide what it hit.
+      const hit = this._traceShot(o, d);
+      _hit.copy(o).addScaledVector(d, hit.t);
+      g.effects.tracer(muzzle, _hit, this.localShooter.color);
+      if (hit.kind === 'wall') this._wallSparks(d);
+      g.net.sendFire(o, d, muzzle);
+      return;
+    }
+    this.resolveShot(o, d, muzzle, this.localShooter);
+  }
+
+  /** Authoritative shot from any player. Returns the hit description. */
+  resolveShot(o, d, muzzle, shooter) {
+    const g = this.game;
+    const hit = this._traceShot(o, d);
     _hit.copy(o).addScaledVector(d, hit.t);
-    g.effects.tracer(g.viewmodel.muzzleWorld(_muzzle), _hit);
+    g.fx.tracer(muzzle, _hit, shooter.color, shooter.id);
 
     switch (hit.kind) {
       case 'wall':
-        _dir.copy(d).negate();
-        g.effects.burst(_hit.x - d.x * 0.1, _hit.y - d.y * 0.1, _hit.z - d.z * 0.1, 14, 5, 0x00f3ff, { life: 0.5, dir: _dir });
+        this._wallSparks(d);
         break;
       case 'head':
-        this.damageEnemy(hit.target, Infinity, d, 'head');
+        this.damageEnemy(hit.target, Infinity, d, 'head', shooter);
         break;
       case 'body':
-        this.damageEnemy(hit.target, 1, d, 'body');
+        this.damageEnemy(hit.target, 1, d, 'body', shooter);
         break;
       case 'barrel':
         this.explodeBarrel(hit.target);
@@ -84,12 +114,18 @@ export class Combat {
         g.effects.burst(hit.target.pos.x, hit.target.pos.y, hit.target.pos.z, 18, 4, 0xffe600, { life: 0.5, grav: 2 });
         g.projectiles.remove(hit.target);
         g.scoring.add(TUNE.deflectScore, 'DEFLECT', 'yellow');
-        g.audio.deflect();
-        g.notifier.hitmarker(false);
+        g.confirmHit(shooter, false);
+        if (shooter.id === g.selfId) g.audio.deflect();
         break;
     }
     // Gunshots are loud: nearby enemies come looking.
-    g.enemies.alertWithin(g.player.pos, TUNE.hearRange);
+    g.enemies.alertWithin(o, TUNE.hearRange);
+    return hit;
+  }
+
+  _wallSparks(d) {
+    _dir.copy(d).negate();
+    this.game.effects.burst(_hit.x - d.x * 0.1, _hit.y - d.y * 0.1, _hit.z - d.z * 0.1, 14, 5, 0x00f3ff, { life: 0.5, dir: _dir });
   }
 
   /** Nearest thing the laser hits: wall/floor, enemy head/body, barrel or enemy bullet. */
@@ -120,31 +156,41 @@ export class Combat {
 
   throwWeapon() {
     const g = this.game;
-    if (g.state !== GameState.PLAYING || !this.gunReady) return;
+    if (g.state !== GameState.PLAYING || !this.gunReady || g.player.down) return;
     this.gunReady = false;
     this.gunReturn = TUNE.gunRespawn;
     g.viewmodel.setVisible(false);
     g.audio.throwWeapon();
     g.time.pulse(0.15);
     g.camera.updateMatrixWorld();
-    const o = g.camera.getWorldPosition(_o);
-    const d = g.camera.getWorldDirection(_d);
-    const t = this.thrown;
+    const o = g.camera.getWorldPosition(_o).addScaledVector(g.camera.getWorldDirection(_d), 0.6);
+    o.y -= 0.15;
+    const vel = _d.clone().multiplyScalar(TUNE.throwSpeed);
+    vel.y += 1.5;
+    // A client's copy is cosmetic; the host simulates the one that counts.
+    this.launch(o, vel, g.isClient ? null : this.localShooter);
+    if (g.isClient) g.net.sendThrow(o, vel);
+  }
+
+  /** @param shooter null for a cosmetic (client-side) throw */
+  launch(pos, vel, shooter) {
+    const t = this.thrown.find((x) => !x.active) ?? this.thrown[0];
     t.active = true;
-    t.pos.copy(o).addScaledVector(d, 0.6);
-    t.pos.y -= 0.15;
-    t.vel.copy(d).multiplyScalar(TUNE.throwSpeed);
-    t.vel.y += 1.5;
-    t.mesh.position.copy(t.pos);
-    t.mesh.quaternion.copy(g.camera.quaternion);
+    t.shooter = shooter;
+    t.pos.copy(pos);
+    t.vel.copy(vel);
+    t.mesh.position.copy(pos);
+    t.mesh.lookAt(_o.copy(pos).add(vel));
     t.mesh.visible = true;
   }
 
   updateThrown(dt) {
-    const t = this.thrown;
-    if (!t.active) return;
+    for (const t of this.thrown) if (t.active) this._updateThrown(t, dt);
+  }
+
+  _updateThrown(t, dt) {
     const g = this.game;
-    const tdt = dt * Math.max(g.time.scale, 0.4);
+    const tdt = dt * Math.max(g.timeField.scaleAt(t.pos), 0.4);
     t.vel.y -= TUNE.throwGravity * tdt;
     t.pos.addScaledVector(t.vel, tdt);
     t.mesh.position.copy(t.pos);
@@ -158,76 +204,82 @@ export class Combat {
     };
     for (const e of g.enemies.alive()) {
       if (Math.hypot(e.pos.x - t.pos.x, e.pos.z - t.pos.z) < 0.85 * e.scale && t.pos.y < 2.2 * e.scale) {
-        this.killEnemy(e, _dir.copy(t.vel).normalize(), 'throw');
+        if (t.shooter) this.killEnemy(e, _dir.copy(t.vel).normalize(), 'throw', t.shooter);
         return end(0xff0055);
       }
     }
     for (const b of g.barrels.items) {
       if (b.alive && b.pos.distanceTo(t.pos) < 1.3) {
-        this.explodeBarrel(b);
+        if (t.shooter) this.explodeBarrel(b);
         return end(0xffaa22);
       }
     }
     if (t.pos.y < 0.1 || g.grid.pointInSolid(t.pos)) end(0x00f3ff);
   }
 
-  /* ───────────── damage resolution ───────────── */
+  /* ───────────── damage resolution (authoritative) ───────────── */
 
-  damageEnemy(e, dmg, dir, cause) {
+  damageEnemy(e, dmg, dir, cause, shooter = this.localShooter) {
     if (!e.alive) return;
     e.hp -= dmg;
     if (e.hp <= 0) {
-      this.killEnemy(e, dir, cause);
+      this.killEnemy(e, dir, cause, shooter);
       return;
     }
     const g = this.game;
-    g.notifier.hitmarker(false);
-    g.audio.hit();
+    g.confirmHit(shooter, false);
     e.stun(dir);
     g.effects.burst(e.pos.x, 1.2 * e.scale, e.pos.z, 16, 4, 0x9b30ff, { life: 0.4, dir });
   }
 
-  killEnemy(e, dir, cause) {
+  killEnemy(e, dir, cause, shooter = this.localShooter) {
     if (!e.alive) return;
     const g = this.game;
     g.enemies.remove(e);
-    g.playAt('shatter', e.pos);
-    if (cause === 'head') g.audio.headshot();
-    g.notifier.hitmarker(true);
-    g.scoring.registerKill(e.type, cause);
-    g.effects.shatter(e.pos, e.scale, dir, e.model.palette);
-    if (cause === 'head') g.effects.burst(e.pos.x, TUNE.headY * e.scale, e.pos.z, 25, 6, 0xffffff, { life: 0.5 });
+    g.confirmHit(shooter, true, cause === 'head');
+    g.scoring.registerKill(e.type, cause, g.isMultiplayer ? shooter.name : null);
+    g.fx.shatter(e.pos, e.scale, dir, e.model.palette.key ?? e.type.palette, cause === 'head');
   }
 
   explodeBarrel(b) {
     if (!b.alive) return;
     const g = this.game;
-    const p = g.player;
     g.barrels.destroy(b);
-    g.playAt('explosion', b.pos);
-    g.effects.explosion(b.pos, TUNE.blastRadius);
+    g.fx.explosion(b.pos);
 
+    const p = g.player;
     const pd = Math.hypot(p.pos.x - b.pos.x, p.pos.z - b.pos.z);
     g.camRig.addTrauma(clamp(1 - pd / 40, 0.1, 0.9));
     g.scoring.add(TUNE.barrelScore, 'PLASMA BLAST', 'yellow');
-    g.notifier.announce('PLASMA BLAST 💥', 'yellow', 700);
+    g.ui.announce('PLASMA BLAST 💥', 'yellow', 700);
 
     for (const e of [...g.enemies.alive()]) {
       if (Math.hypot(e.pos.x - b.pos.x, e.pos.z - b.pos.z) < TUNE.blastRadius) {
         const dir = new THREE.Vector3(e.pos.x - b.pos.x, 0.4, e.pos.z - b.pos.z).normalize();
-        this.killEnemy(e, dir, 'blast');
+        this.killEnemy(e, dir, 'blast', { id: null, name: '💥', color: 0xffaa22 });
       }
     }
     g.barrels.armWithin(b.pos, TUNE.blastRadius, TUNE.blastChainDelay);
     g.projectiles.destroyWithin(b.pos, TUNE.blastRadius * 0.7);
-    if (pd < TUNE.blastPlayerRadius && p.invuln <= 0 && g.state === GameState.PLAYING) {
-      this.hurtPlayer(Math.round(TUNE.blastPlayerDmg * (1 - pd / TUNE.blastPlayerRadius) + 8), b.pos.x, b.pos.z);
+    if (!g.simRunning) return;
+    for (const t of g.targets()) {
+      const d = Math.hypot(t.pos.x - b.pos.x, t.pos.z - b.pos.z);
+      if (d < TUNE.blastPlayerRadius && t.invuln <= 0) {
+        this.hurtTarget(t, Math.round(TUNE.blastPlayerDmg * (1 - d / TUNE.blastPlayerRadius) + 8), b.pos.x, b.pos.z);
+      }
     }
+  }
+
+  /** Damage any player: the local one directly, a remote one via the network. */
+  hurtTarget(target, dmg, fromX, fromZ) {
+    if (target === this.game.player) this.hurtPlayer(dmg, fromX, fromZ);
+    else this.game.net?.sendHit(target.id, dmg, fromX, fromZ);
   }
 
   hurtPlayer(dmg, fromX, fromZ) {
     const g = this.game;
     const p = g.player;
+    if (p.down) return;
     p.hp -= dmg;
     p.lastHit = 0;
     g.camRig.flashDamage();

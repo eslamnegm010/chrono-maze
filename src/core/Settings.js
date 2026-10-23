@@ -1,7 +1,7 @@
 const SETTINGS_KEY = 'chronomaze_settings';
 const BEST_KEY = 'chronomaze_best';
 
-const DEFAULTS = Object.freeze({ sens: 1, vol: 0.7, bloom: true });
+const DEFAULTS = Object.freeze({ sens: 1, vol: 0.7, bloom: true, name: '', color: 'cyan' });
 
 /** localStorage can be missing or throw (private mode, sandboxed iframes) — fall back to memory. */
 function safeStorage() {

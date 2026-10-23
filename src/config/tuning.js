@@ -38,6 +38,16 @@ export const TUNE = Object.freeze({
   timeAir: 0.55,
   timeFire: 0.5,
   timeLook: 0.16,
+  // Multiplayer time bubbles
+  bubbleRadius: 14,
+  ambientTime: 0.4,
+  // Multiplayer co-op
+  reviveRadius: 3,
+  reviveTime: 3,
+  reviveStillScale: 0.25,
+  reviveHp: 60,
+  netRate: 20,
+  maxPlayers: 4,
 
   // Enemies
   enemyRadius: 0.5,

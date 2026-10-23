@@ -64,3 +64,25 @@ export function createSharedAssets(renderer) {
 
   return { tex, geo, mat, palettes };
 }
+
+/** Lazily creates (and caches) the robot palette for a player colour. */
+export function playerPalette(assets, color) {
+  const key = `player-${color.key}`;
+  if (!assets.palettes[key]) {
+    const tint = new THREE.Color(color.hex);
+    assets.palettes[key] = {
+      key,
+      // Tinted armour so teammates read by colour from every side, not only the visor.
+      body: new THREE.MeshStandardMaterial({
+        color: tint.clone().multiplyScalar(0.75),
+        roughness: 0.3,
+        metalness: 0.65,
+        emissive: tint.clone().multiplyScalar(0.12),
+      }),
+      visor: new THREE.MeshBasicMaterial({ color: color.hex }),
+      shard: new THREE.MeshStandardMaterial({ color: color.hex, emissive: tint.clone().multiplyScalar(0.4), roughness: 0.2 }),
+      fx: color.hex,
+    };
+  }
+  return assets.palettes[key];
+}

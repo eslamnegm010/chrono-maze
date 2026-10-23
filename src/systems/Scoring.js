@@ -2,8 +2,9 @@ import { TUNE, KILL_BONUS } from '../config/tuning.js';
 
 /** Score, kill stats and the timed combo multiplier. */
 export class Scoring {
-  constructor(notifier) {
-    this.notifier = notifier;
+  /** @param ui {feed(text, color), announce(text, color, ms)} — broadcast to peers in multiplayer */
+  constructor(ui) {
+    this.ui = ui;
     this.reset();
   }
 
@@ -25,11 +26,15 @@ export class Scoring {
 
   add(points, label, color) {
     this.score += points;
-    this.notifier.feed(`+${points}  ${label}`, color);
+    this.ui.feed(`+${points}  ${label}`, color);
   }
 
-  /** @param type ENEMY_TYPES entry · @param cause 'body' | 'head' | 'blast' | 'throw' */
-  registerKill(type, cause) {
+  /**
+   * @param type  ENEMY_TYPES entry
+   * @param cause 'body' | 'head' | 'blast' | 'throw'
+   * @param by    shooter name shown in the feed (multiplayer), or null
+   */
+  registerKill(type, cause, by = null) {
     this.kills++;
     if (cause === 'head') this.headshots++;
     this.combo = this.comboT > 0 ? this.combo + 1 : 1;
@@ -37,10 +42,10 @@ export class Scoring {
 
     const bonus = KILL_BONUS[cause] ?? KILL_BONUS.body;
     const mult = this.multiplier;
-    const label = bonus.label ?? type.label;
+    const label = (by ? `${by} · ` : '') + (bonus.label ?? type.label);
     this.add((type.score + bonus.bonus) * mult, mult > 1 ? `${label} x${mult}` : label, cause === 'head' ? 'yellow' : 'pink');
 
-    const n = this.notifier;
+    const n = this.ui;
     if (this.combo === 2) n.announce('DOUBLE KILL', 'cyan', 700);
     else if (this.combo === 3) n.announce('TRIPLE KILL', 'cyan', 800);
     else if (this.combo >= 4) n.announce('CHRONO MASTER', 'yellow', 900);

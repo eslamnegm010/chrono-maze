@@ -5,7 +5,7 @@ const RADIUS = 72;
 const RANGE_M = 48;
 const RANGE_CELLS = 5;
 
-/** Player-up rotating sonar: walls, barrels, enemy bullets and enemies (red = hunting). */
+/** Player-up rotating sonar: walls, barrels, enemy bullets, enemies (red = hunting) and teammates. */
 export class Radar {
   constructor(canvas) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -17,7 +17,7 @@ export class Radar {
     this.acc = 0;
   }
 
-  /** Throttled to ~30 Hz. snapshot: { grid, player, barrels, enemies, bullets, time } */
+  /** Throttled to ~30 Hz. snapshot: { grid, player, barrels, enemies, bullets, allies?, time } */
   update(dt, snapshot) {
     this.acc += dt;
     if (this.acc < 1 / 30) return;
@@ -25,7 +25,7 @@ export class Radar {
     this.draw(snapshot);
   }
 
-  draw({ grid, player: p, barrels, enemies, bullets, time }) {
+  draw({ grid, player: p, barrels, enemies, bullets, allies = [], time }) {
     const ctx = this.ctx;
     const cx = SIZE / 2;
     const cy = SIZE / 2;
@@ -76,6 +76,13 @@ export class Radar {
         ctx.stroke();
       }
     }
+    for (const a of allies) {
+      if (!a.seen) continue;
+      ctx.fillStyle = a.color.css;
+      ctx.globalAlpha = a.down ? 0.45 + 0.4 * Math.sin(time * 8) : 1;
+      ctx.fillRect((a.pos.x - p.pos.x) * scale - 3.5, (a.pos.z - p.pos.z) * scale - 3.5, 7, 7);
+    }
+    ctx.globalAlpha = 1;
     ctx.restore();
 
     if (ctx.createConicGradient) {
