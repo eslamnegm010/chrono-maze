@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Chrono Strike is a free neon FPS in your browser where time only moves when you move. Freeze bullets mid-air, fight robot waves solo, or play online co-op and PvP with friends. No download."
+    />
+    <link rel="canonical" href="https://eslamnegm.is-a.dev/chrono-maze/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Chrono Strike" />
+    <meta property="og:title" content="Chrono Strike: free browser FPS where time moves when you move" />
+    <meta
+      property="og:description"
+      content="Freeze bullets mid-air, outsmart robot squads and duel friends online. Free, no download, desktop and mobile."
+    />
+    <meta property="og:url" content="https://eslamnegm.is-a.dev/chrono-maze/" />
+    <meta property="og:image" content="https://eslamnegm.is-a.dev/chrono-maze/og-cover.jpg" />
+    <meta property="og:image:secure_url" content="https://eslamnegm.is-a.dev/chrono-maze/og-cover.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content="Chrono Strike: a neon robot and the game logo" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="675" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Chrono Strike: free browser FPS where time moves when you move" />
+    <meta name="twitter:image" content="https://eslamnegm.is-a.dev/chrono-maze/og-cover.jpg" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Chrono Strike",
+        "url": "https://eslamnegm.is-a.dev/chrono-maze/",
+        "image": "https://eslamnegm.is-a.dev/chrono-maze/og-cover.jpg",
+        "description": "A free neon first-person shooter in the browser where time only moves when you move. Solo robot waves, online co-op and PvP time duels.",
+        "genre": ["Shooter", "Action", "FPS"],
+        "gamePlatform": ["Web browser", "Desktop", "Mobile"],
+        "applicationCategory": "Game",
+        "operatingSystem": "Any",
+        "playMode": ["SinglePlayer", "MultiPlayer", "CoOp"],
+        "inLanguage": ["en", "ar", "es", "pt", "fr", "de", "tr", "ru", "id"],
+        "author": { "@type": "Person", "name": "Eslam Negm", "url": "https://eslamnegm.is-a.dev/" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
+    <meta name="theme-color" content="#05060d" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Chrono Strike" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <title>Chrono Strike: Free Browser FPS Where Time Moves When You Move</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@500;700;900&family=Exo+2:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/index-DYn69CoJ.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/three-BjLTOMj8.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-CZNNe9h3.css">
+  </head>
+  <body>
+    <noscript>
+      <h1>Chrono Strike: free online FPS game in your browser</h1>
+      <p>
+        Chrono Strike is a free 3D shooting game you play in the browser, no download and no account. Time only moves when you move: stand
+        still and enemy bullets freeze mid-air, take a step and everything rushes back. Fight waves of robots solo, team up in online co-op
+        with up to 4 friends, or face up to 8 players in PvP time duels. Works on PC and mobile, in 9 languages.
+      </p>
+      <p lang="ar" dir="rtl">
+        كرونو سترايك لعبة تصويب مجانية أونلاين تعمل في المتصفح دون تحميل: الزمن لا يتحرك إلا عندما تتحرك. واجه موجات الروبوتات وحدك أو العب
+        مع أصدقائك في وضع تعاوني أو مبارزة.
+      </p>
+      <p>Please enable JavaScript to play.</p>
+    </noscript>
+    <!-- Loading screen: plain HTML/CSS so it shows before the game's code arrives (src/ui/loader.js removes it). -->
+    <div id="loader" aria-hidden="true">
+      <style>#loader{--p:.12;z-index:9999;pointer-events:none;background:radial-gradient(circle at 50% 42%,#14123a 0%,#070818 55%,#03040a 100%);place-content:center;justify-items:center;gap:22px;font-family:Orbitron,"Exo 2",system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;transition:opacity .6s .35s;display:grid;position:fixed;top:0;bottom:0;left:0;right:0}#loader svg{filter:drop-shadow(0 0 6px #00f3ff88);width:min(42vmin,220px);height:auto;overflow:visible}#loader .rim{fill:none;stroke:#1d2a5a;stroke-width:2px}#loader .arc{fill:none;stroke:url(#ld-grad);stroke-width:3.5px;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:calc(289px * (1 - var(--p)));transform-origin:60px 60px;transition:stroke-dashoffset .5s;transform:rotate(-90deg)}#loader .tk{stroke:#2c3a72;stroke-width:2.4px;stroke-linecap:round;animation:1.2s linear infinite ld-tick;animation-delay:calc(var(--i) * .1s)}#loader .hand{stroke-linecap:round;transform-origin:60px 60px;animation:linear infinite ld-spin}#loader .min{stroke:#00f3ff;stroke-width:2.6px;animation-duration:1.1s}#loader .hr{stroke:#ff2d6f;stroke-width:3.6px;animation-duration:13s}#loader .hub{fill:#fff}#loader .logo{letter-spacing:.22em;color:#dffcff;text-shadow:0 0 12px #00f3ff99;font-size:clamp(18px,4.4vmin,34px);font-weight:900}#loader .logo b{color:#ff2d6f;text-shadow:0 0 12px #ff2d6f99}#loader .bar{background:#1a2148;border-radius:3px;width:min(52vw,260px);height:3px;overflow:hidden}#loader .bar i{height:100%;width:calc(var(--p) * 100%);background:linear-gradient(90deg,#00f3ff,#9b30ff,#ff2d6f);transition:width .5s;display:block}#loader.done{opacity:0}#loader.done .hand,#loader.done .tk{animation-play-state:paused}#loader.done svg{animation:.5s ease-out forwards ld-flash}@keyframes ld-spin{to{transform:rotate(360deg)}}@keyframes ld-tick{0%,70%,to{stroke:#2c3a72}10%{stroke:#00f3ff}}@keyframes ld-flash{30%{filter:drop-shadow(0 0 22px #fff)brightness(1.8);transform:scale(1.08)}to{transform:scale(1.02)}}@media (prefers-reduced-motion:reduce){#loader .hand,#loader .tk{animation:none}}</style>
+      <svg viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="ld-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#00f3ff" />
+            <stop offset="0.5" stop-color="#9b30ff" />
+            <stop offset="1" stop-color="#ff2d6f" />
+          </linearGradient>
+        </defs>
+        <circle class="rim" cx="60" cy="60" r="46" />
+        <circle class="arc" cx="60" cy="60" r="46" />
+        <line class="tk" style="--i: 0" x1="60" y1="12" x2="60" y2="19" transform="rotate(0 60 60)" />
+        <line class="tk" style="--i: 1" x1="60" y1="12" x2="60" y2="16" transform="rotate(30 60 60)" />
+        <line class="tk" style="--i: 2" x1="60" y1="12" x2="60" y2="16" transform="rotate(60 60 60)" />
+        <line class="tk" style="--i: 3" x1="60" y1="12" x2="60" y2="19" transform="rotate(90 60 60)" />
+        <line class="tk" style="--i: 4" x1="60" y1="12" x2="60" y2="16" transform="rotate(120 60 60)" />
+        <line class="tk" style="--i: 5" x1="60" y1="12" x2="60" y2="16" transform="rotate(150 60 60)" />
+        <line class="tk" style="--i: 6" x1="60" y1="12" x2="60" y2="19" transform="rotate(180 60 60)" />
+        <line class="tk" style="--i: 7" x1="60" y1="12" x2="60" y2="16" transform="rotate(210 60 60)" />
+        <line class="tk" style="--i: 8" x1="60" y1="12" x2="60" y2="16" transform="rotate(240 60 60)" />
+        <line class="tk" style="--i: 9" x1="60" y1="12" x2="60" y2="19" transform="rotate(270 60 60)" />
+        <line class="tk" style="--i: 10" x1="60" y1="12" x2="60" y2="16" transform="rotate(300 60 60)" />
+        <line class="tk" style="--i: 11" x1="60" y1="12" x2="60" y2="16" transform="rotate(330 60 60)" />
+        <line class="hand hr" x1="60" y1="60" x2="60" y2="38" />
+        <line class="hand min" x1="60" y1="60" x2="60" y2="24" />
+        <circle class="hub" cx="60" cy="60" r="3.2" />
+      </svg>
+      <div class="logo">CHRONO <b>STRIKE</b></div>
+      <div class="bar"><i></i></div>
+    </div>
+    <div id="canvas-container"></div>
+    <div id="lowhp-overlay"></div>
+    <div id="damage-overlay"></div>
+
+    <div id="crosshair">
+      <i class="ch t"></i><i class="ch b"></i><i class="ch l"></i><i class="ch r"></i><i class="dot"></i>
+      <div id="hitmarker"><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div id="dmg-indicators"></div>
+
+    <div id="hud" class="hidden">
+      <div class="panel" id="hud-radar">
+        <canvas id="radar-canvas" width="150" height="150"></canvas>
+        <div class="radar-label">SONAR</div>
+        <div id="wave-label" class="num coop-only">WAVE 1</div>
+      </div>
+
+      <div class="panel pvp-only" id="hud-pvp">
+        <div class="round-label" id="round-val"></div>
+        <div class="life-label"><i data-icon="time"></i><span data-i18n="hud.life">رصيد الزمن</span></div>
+        <div id="life-val" class="num">90</div>
+        <div class="pvp-sub">
+          <span><i data-icon="trophy"></i> <b class="num" id="wins-val">0</b></span>
+          <span><i data-icon="aim"></i> <b class="num" id="kills-val">0</b></span>
+          <span><i data-icon="timer"></i> <b class="num" id="match-time">5:00</b></span>
+        </div>
+      </div>
+
+      <div class="panel coop-only" id="hud-score">
+        <div class="row"><span data-i18n="hud.score">النقاط</span><span class="num" id="score-val">0</span></div>
+        <div class="row"><span data-i18n="hud.enemies">الأعداء المتبقّون</span><span class="num" id="enemies-val">0</span></div>
+        <div id="combo" class="num">COMBO x1</div>
+        <div class="combo-bar"><div id="combo-fill"></div></div>
+      </div>
+
+      <div class="panel hidden" id="hud-team">
+        <div class="team-title">
+          <span data-i18n="hud.team">الفريق</span> · <span class="num" id="room-label"></span> <span class="num" id="lives-label"></span>
+        </div>
+        <div id="team-list"></div>
+      </div>
+
+      <div id="downed" class="hidden">
+        <div class="downed-title" id="downed-title"></div>
+        <div class="downed-sub" id="downed-sub"></div>
+        <div class="bar"><div id="revive-fill"></div></div>
+      </div>
+
+      <div class="panel" id="hud-vitals">
+        <div class="bar-label"><span data-i18n="hud.shield">الدرع</span><span class="num" id="hp-val">100</span></div>
+        <div class="bar"><div id="hp-fill"></div></div>
+        <div class="bar-label dash-row">
+          <span><i data-icon="zap"></i> <span data-i18n="hud.dash">الاندفاع</span></span
+          ><span id="dash-state"></span>
+        </div>
+        <div class="bar" id="dash-bar"><div id="dash-fill"></div></div>
+        <div class="bar-label"><span data-i18n="hud.ammo">المخزن</span><span class="num" id="ammo">●●●●●●</span></div>
+        <div class="bar-label laser-row"><span data-i18n="hud.laser">خيط الضوء</span></div>
+        <div class="bar" id="laser-bar"><div id="laser-fill"></div></div>
+      </div>
+
+      <div id="nova-gauge" aria-hidden="true">
+        <i id="nova-ring"></i>
+        <i data-icon="nova"></i>
+        <span id="nova-key">Q</span>
+      </div>
+
+      <div id="hud-perks" class="hidden"></div>
+
+      <div class="panel" id="hud-time">
+        <div id="time-label"><span id="time-state"></span><span class="num" id="time-val">5%</span></div>
+        <div class="bar"><div id="time-fill"></div></div>
+        <div class="stasis-row coop-only">
+          <span data-i18n="hud.stasis"></span>
+          <div class="bar" id="stasis-bar"><div id="stasis-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="panel" id="hud-controls">
+        <div class="chip"><span class="key">W A S D</span><span data-i18n="help.move"></span></div>
+        <div class="chip"><span class="key">Mouse</span><span data-i18n="help.aim"></span></div>
+        <div class="chip"><span class="key">Click</span><span data-i18n="help.firePvp"></span></div>
+        <div class="chip coop-only"><span class="key">R-Click</span><span data-i18n="help.altCoop"></span></div>
+        <div class="chip pvp-only"><span class="key">R-Click</span><span data-i18n="help.altPvp"></span></div>
+        <div class="chip"><span class="key">Shift</span><span data-i18n="help.dash"></span></div>
+        <div class="chip"><span class="key">Space</span><span data-i18n="help.jump"></span></div>
+        <div class="chip coop-only"><span class="key">F</span><span data-i18n="help.throwCoop"></span></div>
+        <div class="chip pvp-only"><span class="key">F</span><span data-i18n="help.throwPvp"></span></div>
+        <div class="chip coop-only"><span class="key">Q</span><span data-i18n="help.nova"></span></div>
+        <div class="chip pvp-only"><span class="key">Q</span><span data-i18n="help.novaPvp"></span></div>
+        <div class="chip"><span class="key">Esc / P</span><span data-i18n="help.pause"></span></div>
+        <div class="chip"><span class="key">H</span><span data-i18n="help.toggle"></span></div>
+      </div>
+    </div>
+
+    <div id="touch-ui"></div>
+    <div id="touch-editor" hidden></div>
+    <div id="rotate">
+      <div class="rotate-icon"><i data-icon="phone"></i></div>
+      <div data-i18n="rotate"></div>
+      <div class="rotate-hint" data-i18n="rotate.lock"></div>
+      <button class="btn ghost small" id="btn-portrait" type="button" data-i18n="rotate.continue"></button>
+    </div>
+
+    <div id="announcer"></div>
+    <div id="tutorial" class="hidden">
+      <div class="tut-head">
+        <span class="tut-kicker" data-i18n="tut.title"></span>
+        <span class="tut-dots"><i class="tut-dot"></i><i class="tut-dot"></i><i class="tut-dot"></i></span>
+      </div>
+      <div class="tut-text"></div>
+    </div>
+    <div id="killfeed"></div>
+    <div id="toast"></div>
+
+    <!-- Restore a backup: paste a code or pick a file, see what it holds, then confirm -->
+    <div class="save-modal" id="save-modal" hidden role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
+      <div class="save-card">
+        <div class="save-card-title" id="save-modal-title"><i data-icon="upload"></i><span data-i18n="save.modal.title"></span></div>
+        <div class="save-input-step" id="save-input-step">
+          <label class="save-label" for="save-paste" data-i18n="save.paste"></label>
+          <textarea class="save-code" id="save-paste" rows="4" dir="ltr" spellcheck="false" autocomplete="off"></textarea>
+          <label class="btn ghost small save-pick" for="save-file-input"
+            ><i data-icon="download"></i><span data-i18n="save.choose"></span
+          ></label>
+          <input type="file" id="save-file-input" accept=".txt,text/plain" hidden />
+        </div>
+        <div class="save-summary" id="save-summary" hidden>
+          <div class="save-summary-title" data-i18n="save.found"></div>
+          <div class="save-stats">
+            <div class="save-stat"><b class="num" id="sv-wave">0</b><span data-i18n="save.stat.wave"></span></div>
+            <div class="save-stat"><b class="num" id="sv-kills">0</b><span data-i18n="save.stat.kills"></span></div>
+            <div class="save-stat"><b class="num" id="sv-looks">0</b><span data-i18n="save.stat.looks"></span></div>
+          </div>
+          <div class="save-hint" data-i18n="save.keep"></div>
+        </div>
+        <div class="save-error" id="save-error" role="alert" hidden></div>
+        <div class="save-card-actions">
+          <button class="btn" id="btn-save-confirm" type="button" disabled>
+            <i data-icon="check"></i><span data-i18n="save.confirm"></span>
+          </button>
+          <button class="btn ghost" id="btn-save-cancel" type="button">
+            <i data-icon="close"></i><span data-i18n="save.cancel"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="splash">
+      <div class="logo">CHRONO STRIKE</div>
+      <button class="btn" id="btn-splash" type="button"><i data-icon="play"></i><span data-i18n="splash.tap"></span></button>
+      <div class="splash-hint" data-i18n="splash.hint"></div>
+    </div>
+
+    <div id="perk-picker" class="hidden" role="dialog" aria-modal="true" aria-labelledby="perk-title">
+      <div class="perk-head">
+        <div id="perk-title" class="perk-title" data-i18n="perk.title"></div>
+        <div class="perk-sub" data-i18n="perk.sub"></div>
+      </div>
+      <div id="perk-cards" class="perk-cards"></div>
+      <div id="perk-hint" class="perk-hint"></div>
+    </div>
+
+    <div id="overlay" data-mode="menu">
+      <!-- 3D Stage Interactive Zone: full viewport, drag to spin character -->
+      <div id="stage-zone" class="stage-zone" data-show="menu ready invite">
+        <div class="stage-podium-info">
+          <div class="stage-name" id="stage-name"></div>
+          <div class="stage-hint" data-i18n="lobby.drag"></div>
+        </div>
+      </div>
+
+      <!-- AAA Mobile Floating Tactical HUD (Only in menu / ready) -->
+      <div class="lobby-hud" data-show="menu ready">
+        <!-- Top Bar: Player Profile, Logo, Settings & Quick Actions -->
+        <header class="lobby-top">
+          <div class="profile-pill" id="btn-open-look-top">
+            <div class="profile-avatar"><span class="avatar-sigil" id="avatar-sigil">◆</span></div>
+            <div class="profile-meta">
+              <div class="profile-row">
+                <span class="profile-name" id="profile-name">--</span>
+                <button class="lv-badge" id="lv-badge" type="button" aria-expanded="false" aria-controls="lv-pop">
+                  <i data-icon="star"></i><span id="lv-num" class="num">1</span>
+                </button>
+              </div>
+              <div class="lv-xp" aria-hidden="true"><i id="lv-fill"></i></div>
+              <div class="best-badge"><i data-icon="trophy"></i><span data-i18n="menu.best"></span> <b class="num" id="best-val">0</b></div>
+            </div>
+            <button class="profile-edit-btn" id="btn-edit-profile" type="button" data-i18n-title="lobby.customize">
+              <i data-icon="edit"></i>
+            </button>
+            <div class="lv-pop" id="lv-pop" role="dialog" hidden></div>
+          </div>
+
+          <div class="logo-cluster">
+            <div class="logo">CHRONO STRIKE</div>
+            <div class="logo-sub" data-i18n="menu.gameTitle"></div>
+          </div>
+
+          <div class="utility-cluster">
+            <button class="util-btn" id="btn-open-settings" type="button" data-i18n-title="lobby.settings">
+              <i data-icon="settings"></i>
+            </button>
+            <button class="util-btn" id="btn-open-guide" type="button" data-i18n-title="lobby.guide"><i data-icon="guide"></i></button>
+          </div>
+        </header>
+
+        <!-- Room Banner for Multiplayer Lobby (Only in ready mode) -->
+        <div class="lobby-room-banner" data-show="ready" data-mp="1">
+          <div class="room-banner-info">
+            <span class="room-status-dot"></span>
+            <span data-i18n="menu.joined"></span>
+            <b class="num room-code">------</b>
+            <span class="mode-label"></span>
+          </div>
+          <div class="room-banner-actions">
+            <button class="btn ghost small" id="btn-ready-invite" type="button">
+              <i data-icon="invite"></i><span data-i18n="room.invite"></span>
+            </button>
+            <button class="btn ghost small danger" id="btn-ready-leave" type="button">
+              <i data-icon="leave"></i><span data-i18n="btn.leave"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Floating Tactical Feature Dock -->
+        <aside class="lobby-dock">
+          <button class="dock-btn" id="btn-dock-look" type="button">
+            <span class="dock-icon"><i data-icon="look"></i></span>
+            <span class="dock-label" data-i18n="lobby.customize"></span>
+          </button>
+          <button class="dock-btn" id="btn-dock-online" type="button">
+            <span class="dock-icon"><i data-icon="online"></i></span>
+            <span class="dock-label" data-i18n="lobby.online"></span>
+          </button>
+          <button class="dock-btn dock-daily" id="btn-dock-daily" type="button">
+            <span class="dock-icon"><i data-icon="calendar"></i><b class="dock-badge num" id="daily-badge" hidden></b></span>
+            <span class="dock-label" data-i18n="daily.title"></span>
+          </button>
+          <button class="dock-btn" id="btn-dock-guide" type="button">
+            <span class="dock-icon"><i data-icon="guide"></i></span>
+            <span class="dock-label" data-i18n="lobby.guide"></span>
+          </button>
+        </aside>
+
+        <!-- Bottom Action Zone: Tactical Map Tile + Main CTA Button -->
+        <footer class="lobby-action">
+          <div class="map-quick-card" id="btn-quick-map" role="button" tabindex="0" data-map-id="core">
+            <div class="map-quick-thumb">
+              <span class="map-thumb-icon" id="quick-map-icon"><i data-icon="core"></i></span>
+              <span class="map-thumb-ring"></span>
+            </div>
+            <div class="map-quick-meta">
+              <div class="map-quick-header">
+                <span class="map-quick-tag">
+                  <span class="map-tag-dot"></span>
+                  <span data-i18n="lobby.quickMap"></span>
+                </span>
+                <span class="map-quick-change"><span data-i18n="lobby.changeMap"></span><i data-icon="chevron"></i></span>
+              </div>
+              <div class="map-quick-name" id="quick-map-name">--</div>
+              <div class="map-quick-badge-wrap">
+                <span class="map-quick-badge" id="quick-map-badge">--</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cta-row">
+            <button class="btn btn-cyber-cta" id="btn-main" data-show="menu pause over ready">
+              <i data-icon="play"></i>
+              <span data-show="menu" data-i18n="btn.solo"></span>
+              <span data-show="pause" data-i18n="btn.resume"></span>
+              <span data-show="over" data-i18n="btn.again"></span>
+              <span data-show="ready" data-i18n="btn.enter"></span>
+            </button>
+            <button class="btn btn-cyber-multiplayer" id="btn-action-online" type="button" data-show="menu">
+              <i data-icon="online" class="btn-mp-icon"></i>
+              <span class="btn-mp-text" data-i18n="lobby.onlineBtn"></span>
+            </button>
+          </div>
+        </footer>
+      </div>
+
+      <!-- Scrim backdrop for sheets -->
+      <div class="sheet-scrim" id="sheet-scrim"></div>
+
+      <!-- Cyber Bottom Sheet 1: Maps Selector -->
+      <div class="cyber-sheet" id="sheet-maps">
+        <div class="sheet-header">
+          <span class="sheet-title"><i data-icon="map"></i><span data-i18n="map.title"></span></span>
+          <button class="sheet-close" id="btn-close-maps" type="button" data-i18n-title="lobby.close"><i data-icon="close"></i></button>
+        </div>
+        <div class="sheet-body">
+          <div class="map-chips" id="map-chips"></div>
+        </div>
+      </div>
+
+      <!-- Cyber Bottom Sheet 2: Customize Look & Character -->
+      <div class="cyber-sheet" id="sheet-look">
+        <div class="sheet-header">
+          <span class="sheet-title"><i data-icon="look"></i><span data-i18n="lobby.customize"></span></span>
+          <button class="sheet-close" id="btn-close-look" type="button" data-i18n-title="lobby.close"><i data-icon="close"></i></button>
+        </div>
+        <div class="sheet-body">
+          <div class="identity">
+            <label for="player-name" data-i18n="id.name"></label>
+            <input
+              type="text"
+              id="player-name"
+              maxlength="16"
+              autocomplete="off"
+              spellcheck="false"
+              data-i18n-placeholder="id.placeholder"
+            />
+            <button class="btn ghost small" id="btn-randname" type="button" data-i18n-title="id.random"><i data-icon="dice"></i></button>
+          </div>
+          <div class="look-tabs" id="look-tabs" role="tablist"></div>
+          <div class="look-pane" id="look-pane-color">
+            <div class="swatches" id="swatches" role="radiogroup" data-i18n-aria="id.color"></div>
+          </div>
+          <div class="look-slots" id="look-slots"></div>
+          <button class="btn ghost small look-random" id="btn-look-random" type="button">
+            <i data-icon="shuffle"></i><span data-i18n="look.random"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cyber Bottom Sheet 3: Multiplayer & Rooms -->
+      <div class="cyber-sheet" id="sheet-online">
+        <div class="sheet-header">
+          <span class="sheet-title"><i data-icon="online"></i><span data-i18n="lobby.online"></span></span>
+          <button class="sheet-close" id="btn-close-online" type="button" data-i18n-title="lobby.close"><i data-icon="close"></i></button>
+        </div>
+        <div class="sheet-body">
+          <div class="mp">
+            <div class="mp-tabs" role="tablist">
+              <button type="button" class="mp-tab active" id="tab-mp-public" role="tab" aria-selected="true" data-tab="public">
+                <i data-icon="online"></i><span data-i18n="online.tabPublic"></span>
+              </button>
+              <button type="button" class="mp-tab" id="tab-mp-custom" role="tab" aria-selected="false" data-tab="custom">
+                <i data-icon="lock"></i><span data-i18n="online.tabCustom"></span>
+              </button>
+            </div>
+
+            <!-- Tab 1: Public Rooms & Quick Match -->
+            <div class="mp-view" id="view-mp-public" data-view="public">
+              <button type="button" class="btn-quick-match" id="btn-quick-match">
+                <span class="qm-icon"><i data-icon="zap"></i></span>
+                <span class="qm-body">
+                  <span class="qm-title" data-i18n="online.quickMatch"></span>
+                  <span class="qm-sub" data-i18n="online.quickMatchSub"></span>
+                </span>
+                <span class="qm-badge" data-i18n="online.instant"></span>
+              </button>
+
+              <div class="mp-rooms-header">
+                <div class="mp-rooms-title">
+                  <i data-icon="orbit"></i>
+                  <span data-i18n="online.liveRooms"></span>
+                  <span class="mp-rooms-count" id="rooms-count">0</span>
+                </div>
+                <button type="button" class="btn-refresh" id="btn-refresh-rooms" data-i18n-title="online.refresh">
+                  <i data-icon="restart"></i>
+                </button>
+              </div>
+
+              <div class="mp-rooms-list" id="rooms-list">
+                <div class="rooms-empty" id="rooms-empty">
+                  <i data-icon="orbit"></i>
+                  <span data-i18n="online.noRooms"></span>
+                </div>
+              </div>
+
+              <div class="mp-host-quick">
+                <span class="mp-hq-label" data-i18n="online.createPrompt"></span>
+                <div class="mp-hq-btns">
+                  <button type="button" class="btn-hq" data-mode="coop" id="btn-host-pub-coop">
+                    <i data-icon="coop"></i><span data-i18n="mp.coop.title"></span>
+                  </button>
+                  <button type="button" class="btn-hq" data-mode="pvp" id="btn-host-pub-pvp">
+                    <i data-icon="pvp"></i><span data-i18n="mp.pvp.title"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Custom / Private Rooms (Original workflow) -->
+            <div class="mp-view" id="view-mp-custom" data-view="custom" hidden>
+              <div class="mp-lead" data-i18n="online.title"></div>
+              <div class="mp-modes">
+                <button class="mp-card" id="btn-host" type="button" data-mode="coop">
+                  <span class="mp-orb"><i data-icon="coop"></i></span>
+                  <span class="mp-name" data-i18n="mp.coop.title"></span>
+                  <span class="mp-desc" data-i18n="mp.coop.desc"></span>
+                  <span class="mp-chip"
+                    ><i data-icon="user"></i><span data-i18n="mp.players" data-i18n-params='{"min":2,"max":4}'></span
+                  ></span>
+                  <span class="mp-cta"><span data-i18n="mp.create"></span><i data-icon="arrow-right" class="mp-arrow"></i></span>
+                </button>
+                <button class="mp-card" id="btn-host-pvp" type="button" data-mode="pvp">
+                  <span class="mp-orb"><i data-icon="pvp"></i></span>
+                  <span class="mp-name" data-i18n="mp.pvp.title"></span>
+                  <span class="mp-desc" data-i18n="mp.pvp.desc"></span>
+                  <span class="mp-chip"
+                    ><i data-icon="user"></i><span data-i18n="mp.players" data-i18n-params='{"min":2,"max":8}'></span
+                  ></span>
+                  <span class="mp-cta"><span data-i18n="mp.create"></span><i data-icon="arrow-right" class="mp-arrow"></i></span>
+                </button>
+              </div>
+              <label class="mp-privacy-toggle">
+                <input type="checkbox" id="chk-room-public" checked />
+                <span data-i18n="online.makePublic"></span>
+              </label>
+              <div class="mp-free"><i data-icon="safe"></i><span data-i18n="mp.free"></span></div>
+              <div class="mp-divider"><span data-i18n="mp.joinWith"></span></div>
+              <div class="mp-join">
+                <input
+                  type="text"
+                  id="room-code"
+                  autocapitalize="characters"
+                  data-i18n-placeholder="mp.codePh"
+                  data-i18n-aria="online.code"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button class="btn mp-join-btn" id="btn-join" type="button" disabled>
+                  <i data-icon="join"></i><span data-i18n="online.join"></span>
+                </button>
+              </div>
+              <details class="mp-how">
+                <summary><i data-icon="guide"></i><span data-i18n="mp.howItWorks"></span></summary>
+                <div class="online-hint" data-i18n-html="online.hint"></div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cyber Bottom Sheet: Daily challenge, missions and streak (filled by ui/DailyPanel.js) -->
+      <div class="cyber-sheet" id="sheet-daily">
+        <div class="sheet-header">
+          <span class="sheet-title"><i data-icon="calendar"></i><span data-i18n="daily.title"></span></span>
+          <button class="sheet-close" id="btn-close-daily" type="button" data-i18n-title="lobby.close"><i data-icon="close"></i></button>
+        </div>
+        <div class="sheet-body">
+          <div class="daily" id="daily-body"></div>
+        </div>
+      </div>
+
+      <!-- Cyber Bottom Sheet 4: Settings -->
+      <div class="cyber-sheet" id="sheet-settings">
+        <div class="sheet-header">
+          <span class="sheet-title"><i data-icon="settings"></i><span data-i18n="lobby.settings"></span></span>
+          <button class="sheet-close" id="btn-close-settings" type="button" data-i18n-title="lobby.close"><i data-icon="close"></i></button>
+        </div>
+        <div class="sheet-body">
+          <div class="settings">
+            <section class="set-section">
+              <h3 class="set-section-title"><i data-icon="aim"></i><span data-i18n="settings.sec.controls"></span></h3>
+              <div class="setting-item">
+                <div class="setting-header">
+                  <div class="setting-icon"><i data-icon="aim"></i></div>
+                  <div class="setting-meta">
+                    <label for="sens" data-i18n="set.sens"></label>
+                    <span class="setting-desc" data-i18n="set.sens.desc"></span>
+                  </div>
+                  <span class="val badge" id="sens-val">1.00</span>
+                </div>
+                <div class="slider-row">
+                  <input type="range" id="sens" min="0.3" max="3" step="0.05" value="1" />
+                </div>
+              </div>
+              <div class="setting-item touch-only">
+                <div class="setting-header">
+                  <div class="setting-icon"><i data-icon="move"></i></div>
+                  <div class="setting-meta">
+                    <label for="btn-touch-edit" data-i18n="touchEdit.open"></label>
+                    <span class="setting-desc" data-i18n="touchEdit.open.desc"></span>
+                  </div>
+                  <button class="btn ghost set-action" id="btn-touch-edit" type="button" data-i18n="touchEdit.edit"></button>
+                </div>
+              </div>
+            </section>
+            <section class="set-section">
+              <h3 class="set-section-title"><i data-icon="volume"></i><span data-i18n="settings.sec.audio"></span></h3>
+              <div class="setting-item">
+                <div class="setting-header">
+                  <div class="setting-icon"><i data-icon="volume"></i></div>
+                  <div class="setting-meta">
+                    <label for="vol" data-i18n="set.vol"></label>
+                    <span class="setting-desc" data-i18n="set.vol.desc"></span>
+                  </div>
+                  <span class="val badge" id="vol-val">70%</span>
+                </div>
+                <div class="slider-row">
+                  <input type="range" id="vol" min="0" max="1" step="0.05" value="0.7" />
+                </div>
+              </div>
+            </section>
+            <section class="set-section">
+              <h3 class="set-section-title"><i data-icon="sparkles"></i><span data-i18n="settings.sec.graphics"></span></h3>
+              <div class="setting-item">
+                <div class="setting-header">
+                  <div class="setting-icon"><i data-icon="sparkles"></i></div>
+                  <div class="setting-meta">
+                    <label for="bloom" data-i18n="set.bloom"></label>
+                    <span class="setting-desc" data-i18n="set.bloom.desc"></span>
+                  </div>
+                  <label class="cyber-toggle" for="bloom">
+                    <input type="checkbox" id="bloom" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+            <section class="set-section">
+              <h3 class="set-section-title"><i data-icon="lang"></i><span data-i18n="settings.sec.language"></span></h3>
+              <div class="setting-item">
+                <div class="setting-meta">
+                  <label id="lang-label" for="lang" data-i18n="set.lang"></label>
+                  <span class="setting-desc" data-i18n="set.lang.desc"></span>
+                </div>
+                <div class="lang-grid" id="lang-grid" role="radiogroup" aria-labelledby="lang-label"></div>
+                <div class="select-wrap" hidden><select id="lang"></select></div>
+              </div>
+            </section>
+            <section class="set-section save-section">
+              <h3 class="set-section-title"><i data-icon="save"></i><span data-i18n="settings.sec.save"></span></h3>
+              <div class="setting-item save-status">
+                <div class="setting-header">
+                  <div class="setting-icon"><i data-icon="safe"></i></div>
+                  <div class="setting-meta">
+                    <span class="save-status-title" data-i18n="save.status"></span>
+                    <span class="setting-desc" id="save-persist"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="save-actions">
+                <button class="btn ghost save-btn" id="btn-save-copy" type="button">
+                  <i data-icon="copy"></i><span data-i18n="save.copy"></span>
+                </button>
+                <button class="btn ghost save-btn" id="btn-save-share" type="button">
+                  <i data-icon="share"></i><span data-i18n="save.share"></span>
+                </button>
+                <button class="btn ghost save-btn" id="btn-save-file" type="button">
+                  <i data-icon="download"></i><span data-i18n="save.file"></span>
+                </button>
+                <button class="btn ghost save-btn" id="btn-save-restore" type="button">
+                  <i data-icon="upload"></i><span data-i18n="save.restore"></span>
+                </button>
+              </div>
+              <div class="save-note" id="save-note" role="status" aria-live="polite"></div>
+              <textarea class="save-code" id="save-fallback" rows="3" readonly hidden dir="ltr"></textarea>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cyber Bottom Sheet 5: Combat & Field Guide -->
+      <div class="cyber-sheet" id="sheet-guide">
+        <div class="sheet-header">
+          <span class="sheet-title"><i data-icon="guide"></i><span data-i18n="lobby.guide"></span></span>
+          <button class="sheet-close" id="btn-close-guide" type="button" data-i18n-title="lobby.close"><i data-icon="close"></i></button>
+        </div>
+        <div class="sheet-body">
+          <div class="info">
+            <div class="info-primary">
+              <div class="info-pill">
+                <span class="pill-icon"><i data-icon="time"></i></span><span data-i18n-html="info.1"></span>
+              </div>
+              <div class="info-pill">
+                <span class="pill-icon"><i data-icon="dash"></i></span><span data-i18n-html="info.parkour"></span>
+              </div>
+            </div>
+            <div class="info-extra-guide">
+              <div class="guide-box">
+                <span class="pill-icon"><i data-icon="target"></i></span><span data-i18n-html="info.2"></span>
+              </div>
+              <div class="guide-box">
+                <span class="pill-icon"><i data-icon="shield"></i></span><span data-i18n-html="info.3"></span>
+              </div>
+              <div class="guide-box">
+                <span class="pill-icon"><i data-icon="barrel"></i></span><span data-i18n-html="info.4"></span>
+              </div>
+              <div class="guide-box">
+                <span class="pill-icon"><i data-icon="heavy"></i></span><span data-i18n-html="info.5"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opened from an invite link: join that room or go back to the lobby (no solo button here) -->
+      <div class="card modal-card invite-card" data-show="invite">
+        <div class="invite-kicker"><i data-icon="online"></i><span data-i18n="invite.kicker"></span></div>
+        <div class="invite-title" data-i18n="invite.title"></div>
+        <div class="invite-code num room-code">------</div>
+        <label class="invite-name">
+          <span data-i18n="id.name"></span>
+          <input type="text" id="invite-name" maxlength="16" autocomplete="off" spellcheck="false" data-i18n-placeholder="id.placeholder" />
+        </label>
+        <div class="swatches invite-swatches" id="invite-swatches" role="radiogroup" data-i18n-aria="id.color"></div>
+        <button class="btn ghost small" id="btn-invite-look" type="button">
+          <i data-icon="look"></i><span data-i18n="invite.customize"></span>
+        </button>
+        <div class="invite-error" id="invite-error" hidden></div>
+        <button class="btn" id="btn-invite-join" type="button"><i data-icon="join"></i><span data-i18n="invite.join"></span></button>
+        <button class="btn ghost small" id="btn-invite-back" type="button">
+          <i data-icon="leave"></i><span data-i18n="invite.back"></span>
+        </button>
+        <div class="invite-hint" data-i18n="invite.hint"></div>
+      </div>
+
+      <!-- Focused Modal Card for Pause and Game Over (Only in pause / over / connecting) -->
+      <div class="card modal-card" data-show="pause over connecting">
+        <div class="logo">CHRONO STRIKE</div>
+        <div class="subtitle" data-show="pause" data-i18n="menu.paused"></div>
+        <div class="subtitle" data-show="connecting"><span data-i18n="menu.connecting"></span> <span class="num room-code"></span>…</div>
+        <div class="subtitle" data-show="over" id="over-title"></div>
+
+        <div class="standings" id="standings" data-show="over"></div>
+        <div class="stats" data-show="over">
+          <div class="stat"><span class="num" id="st-score">0</span><span data-i18n="stat.score"></span></div>
+          <div class="stat"><span class="num" id="st-wave">0</span><span data-i18n="stat.wave"></span></div>
+          <div class="stat"><span class="num" id="st-kills">0</span><span data-i18n="stat.kills"></span></div>
+          <div class="stat"><span class="num" id="st-heads">0</span><span data-i18n="stat.heads"></span></div>
+        </div>
+
+        <div class="xp-panel" id="xp-panel" data-show="over" hidden>
+          <div class="xp-head">
+            <span class="xp-lv num" id="xp-lv">1</span>
+            <span class="xp-gain num" id="xp-gain"></span>
+          </div>
+          <div class="xp-track"><i id="xp-fill"></i><span class="xp-flash" id="xp-flash"></span></div>
+          <div class="xp-src" id="xp-src"></div>
+          <div class="xp-next" id="xp-next"></div>
+        </div>
+
+        <div class="over-daily" id="over-daily" data-show="over" data-mp="0">
+          <i data-icon="calendar"></i><span id="over-daily-text"></span>
+        </div>
+
+        <div class="room-box" data-show="pause" data-mp="1">
+          <span><span data-i18n="room.label"></span> <b class="num room-code"></b> <span class="mode-label"></span></span>
+          <button class="btn ghost small" id="btn-invite" type="button">
+            <i data-icon="invite"></i><span data-i18n="room.invite"></span>
+          </button>
+        </div>
+        <div class="over-perks off" id="over-perks" data-show="over"></div>
+        <div class="waiting" id="over-waiting" data-show="over" data-i18n="over.waiting"></div>
+
+        <div class="btns">
+          <button class="btn" id="btn-modal-main" data-show="pause over">
+            <i data-icon="play"></i>
+            <span data-show="pause" data-i18n="btn.resume"></span>
+            <span data-show="over" data-i18n="btn.again"></span>
+          </button>
+          <button class="btn" id="btn-revive-ad" data-show="over" data-mp="0" type="button" hidden>
+            <i data-icon="video"></i><span data-i18n="revive.ad"></span>
+          </button>
+          <button class="btn" id="btn-revive-score" data-show="over" data-mp="0" type="button" hidden>
+            <i data-icon="revive"></i><span data-i18n="revive.score"></span>
+          </button>
+          <button class="btn ghost" id="btn-skip-tut" data-show="pause" hidden><span data-i18n="tut.skip"></span></button>
+          <button class="btn ghost touch-only" id="btn-touch-edit-pause" data-show="pause" type="button">
+            <i data-icon="move"></i><span data-i18n="touchEdit.open"></span>
+          </button>
+          <button class="btn ghost" id="btn-restart" data-show="pause">
+            <i data-icon="restart"></i><span data-i18n="btn.restart"></span>
+          </button>
+          <button class="btn ghost" id="btn-lobby" data-show="pause over" data-mp="0" type="button">
+            <i data-icon="leave"></i><span data-i18n="btn.lobby"></span>
+          </button>
+          <button class="btn ghost" id="btn-leave" data-show="pause over connecting" data-mp="1">
+            <i data-icon="leave"></i><span data-i18n="btn.leave"></span>
+          </button>
+        </div>
+        <div id="load-error"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
